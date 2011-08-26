@@ -18,6 +18,7 @@ class Products(models.Model):
     creator_id = models.IntegerField()
     last_updated = models.DateTimeField()
     creation_date = models.DateTimeField()
+    
     def __unicode__(self):
         return self.name
     
@@ -34,47 +35,25 @@ class Branches(models.Model):
     creator_id = models.IntegerField()
     last_updated = models.DateTimeField()
     creation_date = models.DateTimeField()
+    
     def __unicode__(self):
         return self.name
+    
     class Meta:
         db_table = u'branches'
 
-
-
-class SubgroupTestgroups(models.Model):
-    subgroup_id = models.IntegerField(primary_key=True)
-    testgroup_id = models.IntegerField(primary_key=True)
-    sort_order = models.IntegerField()
-    class Meta:
-        db_table = u'subgroup_testgroups'
-
-class Subgroups(models.Model):
-    subgroup_id = models.IntegerField(primary_key=True)
-    name = models.CharField(max_length=192)
-    enabled = models.IntegerField(null=True, blank=True)
-    product_id = models.IntegerField()
-    branch_id = models.IntegerField()
-    creator_id = models.IntegerField()
-    last_updated = models.DateTimeField()
-    creation_date = models.DateTimeField()
-    class Meta:
-        db_table = u'subgroups'
-
-class TestcaseSubgroups(models.Model):
-    testcase_id = models.IntegerField(primary_key=True)
-    subgroup_id = models.IntegerField(primary_key=True)
-    sort_order = models.IntegerField()
-    class Meta:
-        db_table = u'testcase_subgroups'
-
 class Testgroups(models.Model):
     testgroup_id = models.IntegerField(primary_key=True)
-    product_id = models.IntegerField()
+    product = models.ForeignKey(Products)
     name = models.CharField(max_length=192)
     enabled = models.IntegerField(null=True, blank=True)
     branch_id = models.IntegerField()
     creator_id = models.IntegerField()
     last_updated = models.DateTimeField()
     creation_date = models.DateTimeField()
+    
+    def __unicode__(self):
+        return self.name
+    
     class Meta:
         db_table = u'testgroups'
