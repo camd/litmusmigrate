@@ -12,7 +12,7 @@ def home(request):
             # ...
             product_id = request.POST.get('product')
             
-            return HttpResponseRedirect('/litmustocsv/product_detail?product=%s' % product_id) # Redirect after POST
+            return HttpResponseRedirect('/litmustocsv/product_detail/%s' % product_id) # Redirect after POST
     else:
         form = HomeForm() # An unbound form
 
@@ -20,14 +20,13 @@ def home(request):
                               {'form': form,},
                               context_instance=RequestContext(request))
 
-def product_detail(request):
+def product_detail(request, product_id):
     if request.method == 'POST': # If the form has been submitted...
-        form = ProductDetailForm(request.POST) # A form bound to the POST data
+        form = ProductDetailForm(request.POST, product_id=product_id) # A form bound to the POST data
         if form.is_valid(): # All validation rules pass
 
-            return HttpResponseRedirect('/thanks/') # Redirect after POST
+            return HttpResponseRedirect('/litmustocsv/getcsv/') # Redirect after POST
     else:
-        product_id = request.GET.get('product')
         form = ProductDetailForm(product_id=product_id) # An unbound form
 
     return render_to_response('product_detail.html', 

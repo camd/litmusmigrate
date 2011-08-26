@@ -11,8 +11,9 @@ class ProductDetailForm(forms.Form):
     branch = forms.ModelChoiceField(queryset=Branches.objects.all())
     testgroups = forms.ModelMultipleChoiceField(queryset=Testgroups.objects.all())
     
-    def __init__(self, product_id):
-        
-        product = Products.objects.filter(product_id=product_id)
-       # self.branch.queryset = Branches.objects.filter(product=product)        
-        #self.testgroups.queryset = Branches.objects.filter(product=product)
+    def __init__(self, *args, **kwargs):
+        product_id = kwargs.pop('product_id')
+        super(ProductDetailForm, self).__init__(*args, **kwargs)
+
+        self.fields['branch'].queryset = Branches.objects.filter(product=product_id)        
+        self.fields['testgroups'].queryset = Testgroups.objects.filter(product=product_id)        
