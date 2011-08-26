@@ -1,6 +1,6 @@
 <h1>Litmus to CSV</h1>
 <p>Start by selecting which product to migrate</p>
-<form action="litmustocsv/product_detail" method="post">{% csrf_token %}
+<form action="litmustocsv" method="post">{% csrf_token %}
 {{ form.as_p }}
 <input type="submit" value="Submit" />
 </form>
