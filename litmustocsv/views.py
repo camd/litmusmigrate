@@ -3,6 +3,8 @@ from models import Products, Branches, Testgroups
 from forms import HomeForm, ProductDetailForm
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext
+import csv
+from django.db import connection
 
 def home(request):
     if request.method == 'POST': # If the form has been submitted...
@@ -21,6 +23,8 @@ def home(request):
                               context_instance=RequestContext(request))
 
 def product_detail(request, product_id):
+    product_name = Products.objects.get(product_id=product_id)
+
     if request.method == 'POST': # If the form has been submitted...
         form = ProductDetailForm(request.POST, product_id=product_id) # A form bound to the POST data
         if form.is_valid(): # All validation rules pass
@@ -29,28 +33,48 @@ def product_detail(request, product_id):
             testgroups = form.cleaned_data['testgroups']
             tg_ids = [str(x.testgroup_id) for x in testgroups]
 
-            return render_to_response('sql.html',
-                                      {'form': form,
-                                       'sql': getsql(product_id,
-                                                     branch_id,
-                                                     tg_ids,
-                                                     )},
-                                      context_instance=RequestContext(request))
+            cursor = connection.cursor()
+            cursor.execute(getsql(product_id, branch_id, tg_ids))
+
+            # Create the HttpResponse object with the appropriate CSV header.
+            response = HttpResponse(mimetype='text/csv')
+            response['Content-Disposition'] = 'attachment; filename=%s_litmusoutput.csv' % product_name
+
+            csv_writer = csv.writer(response)
+            csv_writer.writerow([i[0] for i in cursor.description]) # write headers
+            csv_writer.writerows(cursor)
+            del csv_writer # this will close the CSV file
+
+            return response
 
             #return HttpResponseRedirect('/litmustocsv/getcsv/') # Redirect after POST
     else:
         form = ProductDetailForm(product_id=product_id) # An unbound form
 
     return render_to_response('product_detail.html',
-                            {'form': form,},
+                            {'form': form,
+                             'product_name': product_name,
+                             },
                             context_instance=RequestContext(request))
 
+
+def render_sql(form, product_id, branch_id, tg_ids, request):
+    product_name = Products.objects.get(product_id=product_id)
+    return render_to_response('sql.html',
+                              {'form': form,
+                               'product_name': product_name,
+                               'sql': getsql(product_id,
+                                             branch_id,
+                                             tg_ids,
+                                             )},
+                              context_instance=RequestContext(request))
 
 
 def getcsv(request):
     return render_to_response('csv.html',
                               {'req': request},
                               context_instance=RequestContext(request))
+
 
 def getsql(product_id, branch_id, testgroup_ids):
 
@@ -59,8 +83,8 @@ def getsql(product_id, branch_id, testgroup_ids):
     sql = '''
 select tc.testcase_id, tc.summary, tc.details, tc.regression_bug_id,
   tc.community_enabled, tc.steps, tc.expected_results, u.email,
-  GROUP_CONCAT(REPLACE(sg.name, ",", "%%2C")) as tags,
-  GROUP_CONCAT(REPLACE(tg.name, ",", "%%2C")) as suites
+  GROUP_CONCAT(REPLACE(sg.name, ",", "%%%%2C")) as tags,
+  GROUP_CONCAT(REPLACE(tg.name, ",", "%%%%2C")) as suites
 from testcases AS tc
 left join products as p on p.product_id = tc.product_id
 left join branches AS b on b.branch_id = tc.branch_id
@@ -85,4 +109,3 @@ group by tc.testcase_id
            'tg_or_statement': tg_or_statement}
 
     return sql
-    #return request
