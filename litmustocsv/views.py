@@ -1,6 +1,6 @@
 from django.shortcuts import render_to_response
 from models import Products, Branches, Testgroups
-from forms import HomeForm, ProductDetailForm
+from forms import HomeForm
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext
 import csv
@@ -12,33 +12,19 @@ def home(request):
         if form.is_valid(): # All validation rules pass
             # Process the data in form.cleaned_data
             # ...
-            product_id = request.POST.get('product')
 
-            return HttpResponseRedirect('/litmustocsv/product_detail/%s' % product_id) # Redirect after POST
-    else:
-        form = HomeForm() # An unbound form
-
-    return render_to_response('home.html',
-                              {'form': form,},
-                              context_instance=RequestContext(request))
-
-def product_detail(request, product_id):
-    product_name = Products.objects.get(product_id=product_id)
-
-    if request.method == 'POST': # If the form has been submitted...
-        form = ProductDetailForm(request.POST, product_id=product_id) # A form bound to the POST data
-        if form.is_valid(): # All validation rules pass
+            product = form.cleaned_data['product']
 
             branch_id = form.cleaned_data['branch'].branch_id
             testgroups = form.cleaned_data['testgroups']
             tg_ids = [str(x.testgroup_id) for x in testgroups]
 
             cursor = connection.cursor()
-            cursor.execute(getsql(product_id, branch_id, tg_ids))
+            cursor.execute(getsql(product.product_id, branch_id, tg_ids))
 
             # Create the HttpResponse object with the appropriate CSV header.
             response = HttpResponse(mimetype='text/csv')
-            response['Content-Disposition'] = 'attachment; filename=%s_litmusoutput.csv' % product_name
+            response['Content-Disposition'] = 'attachment; filename=%s_litmusoutput.csv' % product.name
 
             csv_writer = csv.writer(response)
             csv_writer.writerow([i[0] for i in cursor.description]) # write headers
@@ -46,33 +32,11 @@ def product_detail(request, product_id):
             del csv_writer # this will close the CSV file
 
             return response
-
-            #return HttpResponseRedirect('/litmustocsv/getcsv/') # Redirect after POST
     else:
-        form = ProductDetailForm(product_id=product_id) # An unbound form
+        form = HomeForm() # An unbound form
 
-    return render_to_response('product_detail.html',
-                            {'form': form,
-                             'product_name': product_name,
-                             },
-                            context_instance=RequestContext(request))
-
-
-def render_sql(form, product_id, branch_id, tg_ids, request):
-    product_name = Products.objects.get(product_id=product_id)
-    return render_to_response('sql.html',
-                              {'form': form,
-                               'product_name': product_name,
-                               'sql': getsql(product_id,
-                                             branch_id,
-                                             tg_ids,
-                                             )},
-                              context_instance=RequestContext(request))
-
-
-def getcsv(request):
-    return render_to_response('csv.html',
-                              {'req': request},
+    return render_to_response('home.html',
+                              {'form': form,},
                               context_instance=RequestContext(request))
 
 

@@ -1,6 +1,24 @@
 <h1>Litmus to CSV</h1>
 <p>Start by selecting which product to migrate</p>
 <form action="litmustocsv" method="post">{% csrf_token %}
-{{ form.as_p }}
-<input type="submit" value="Submit" />
+
+    {{ form.non_field_errors }}
+    <div class="fieldWrapper">
+        {{ form.product.errors }}
+        <label for="id_product">Product:</label>
+        {{ form.product }}
+    </div>
+    <div class="fieldWrapper">
+        {{ form.branch.errors }}
+        <label for="id_product">Branch:</label>
+        {{ form.branch }}
+    </div>
+    <div class="fieldWrapper">
+        {{ form.testgroups.errors }}
+        <label for="id_testgroup">Testgroups:</label>
+        {{ form.testgroups }}
+    </div>
+
+
+<input type="submit" value="Get CSV" />
 </form>
