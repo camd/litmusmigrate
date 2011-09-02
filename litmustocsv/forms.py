@@ -4,7 +4,5 @@ from django.forms import ChoiceField, MultipleChoiceField
 
 class HomeForm(forms.Form):
 
-    product = forms.ModelChoiceField(queryset=Products.objects.all())
-    branch = forms.ModelChoiceField(queryset=Branches.objects.all())
-    testgroups = forms.ModelMultipleChoiceField(queryset=Testgroups.objects.all())
+    product = forms.ModelChoiceField(queryset=Products.objects.all().order_by('name'))
 

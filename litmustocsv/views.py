@@ -1,10 +1,12 @@
-from django.shortcuts import render_to_response
-from models import Products, Branches, Testgroups
-from forms import HomeForm
-from django.http import HttpResponse, HttpResponseRedirect
-from django.template import RequestContext
-import csv
 from django.db import connection
+from django.http import HttpResponse, HttpResponseRedirect
+from django.shortcuts import render_to_response
+from django.template import RequestContext
+from forms import HomeForm
+from models import Products, Branches, Testgroups
+import csv
+from django.utils.simplejson import dumps, loads
+from django.core import serializers
 
 def home(request):
     if request.method == 'POST': # If the form has been submitted...
@@ -15,7 +17,7 @@ def home(request):
 
             product = form.cleaned_data['product']
 
-            branch_id = form.cleaned_data['branch'].branch_id
+            branch_id = form.cleaned_data['branch']
             testgroups = form.cleaned_data['testgroups']
             tg_ids = [str(x.testgroup_id) for x in testgroups]
 
@@ -35,8 +37,14 @@ def home(request):
     else:
         form = HomeForm() # An unbound form
 
+    branches = Branches.objects.all().order_by('name')
+    testgroups = Testgroups.objects.all().order_by('name')
+
     return render_to_response('home.html',
-                              {'form': form,},
+                              {'form': form,
+                               'branches': branches,
+                               'testgroups': testgroups
+                               },
                               context_instance=RequestContext(request))
 
 
