@@ -1,3 +1,8 @@
+<head>
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/screen.css" media="screen, projection" />
+</head>
+
+<div class="container">
 <h1>Litmus to CSV</h1>
 <p>Start by selecting which product to migrate</p>
 <form action="litmustocsv" method="post">{% csrf_token %}
@@ -28,7 +33,7 @@
     </div>
 
 <input type="submit" value="Get CSV" />
-
+</div>
 <script type="text/javascript" src="{{ STATIC_URL }}js/jquery-1.6.1.js"></script>
 <script>
     $(document).ready(function() {
