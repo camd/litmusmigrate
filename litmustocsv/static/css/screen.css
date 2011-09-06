@@ -787,7 +787,7 @@ select[multiple] {
   font-size: 0.857em;
   line-height: 1.888em;
   margin-bottom: 1.618em;
-  height: auto;
+  height: 40%;
   width: 100%;
   padding: 0.405em;
   background: rgba(233, 237, 237, 0.618);
@@ -1037,6 +1037,7 @@ button.sub:focus, button.sub:hover, button.sub:active {
 
 .simple, #login, #register {
   clear: both;
+  padding-top: 5%;
   padding-left: 25.263%;
   padding-right: 25.263%;
 }

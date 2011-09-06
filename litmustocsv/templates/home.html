@@ -2,7 +2,7 @@
     <link rel="stylesheet" href="{{ STATIC_URL }}css/screen.css" media="screen, projection" />
 </head>
 
-<div class="container">
+<div class="simple">
 <h1>Litmus to CSV</h1>
 <p>Start by selecting which product to migrate</p>
 <form action="litmustocsv" method="post">{% csrf_token %}
@@ -25,37 +25,41 @@
     <div class="fieldWrapper">
         {{ form.testgroups.errors }}
         <label for="id_testgroups">Testgroups:</label>
-            <select multiple="multiple" name="testgroups" id="id_testgroups">
+            <select class="tall" multiple="multiple" name="testgroups" id="id_testgroups">
                 {% for tg in testgroups %}
                   <option value="{{ tg.testgroup_id }}" br_id="{{ tg.branch_id }}">{{ tg.name }}</option>
                 {% endfor %}
             </select>
     </div>
 
-<input type="submit" value="Get CSV" />
+<input id="id_getcsv"type="submit" value="Get CSV" />
 </div>
 <script type="text/javascript" src="{{ STATIC_URL }}js/jquery-1.6.1.js"></script>
 <script>
     $(document).ready(function() {
 
-        // store away the options for branches
-        window.branch_options = $("#id_branch").children();
-        $("#id_branch_dest").html(window.branch_options);
-        $("#id_branch").children().remove().end().append('<option selected value="None">Select Product First</option>');
+        function on_product_set() {
 
-        // store away the options for testgroups
-        window.testgroup_options = $("#id_testgroups").children();
-        $("#id_testgroups").children().remove().end().append('<option selected value="None">Select Branch First</option>');
-
-        $("#id_product").change(function() {
             var prod_id = $("#id_product").val();
             var options = '<option value="None">--- Select One ---</option>';
-            window.branch_options.each(function() {
-                if ($(this).attr('prod_id') == prod_id) {
-                    options += '<option value="' + $(this).val() + '">' + $(this).text() + '</option>';
-                }
 
-            });
+            $("#id_branch").show();
+            $("#id_testgroups").hide();
+            $("#id_getcsv").hide();
+
+
+            if ($("#id_product").val() == "") {
+                $("#id_branch").hide();
+                $("#id_testgroups").hide();
+                $("#id_getcsv").hide();
+
+            } else {
+                window.branch_options.each(function() {
+                    if ($(this).attr('prod_id') == prod_id) {
+                        options += '<option value="' + $(this).val() + '">' + $(this).text() + '</option>';
+                    }
+                });
+            }
 
             $("#id_branch").html(options);   // populate select box with array
 
@@ -63,6 +67,10 @@
             $("#id_branch").change(function() {
                 var br_id = $("#id_branch").val();
                 var b_opts = '';
+
+                $("#id_testgroups").show();
+                $("#id_getcsv").show();
+
                 window.testgroup_options.each(function() {
                     if ($(this).attr('br_id') == br_id) {
                         b_opts += '<option value="' + $(this).val() + '">' + $(this).text() + '</option>';
@@ -74,10 +82,30 @@
 
             });
 
-        });
+        }
+
+        // hide secondary elements at first
+        $("#id_branch").hide();
+        $("#id_testgroups").hide();
+        $("#id_getcsv").hide();
+
+
+        // store away the options for branches
+        window.branch_options = $("#id_branch").children();
+        $("#id_branch").children().remove().end().append('<option selected value="None">Select Product First</option>');
+
+        // store away the options for testgroups
+        window.testgroup_options = $("#id_testgroups").children();
+        $("#id_testgroups").children().remove().end().append('<option selected value="None">Select Branch First</option>');
+
+
+        $("#id_product").change(on_product_set);
+        on_product_set();
 
 
     });
+
+
 
 </script>
 
