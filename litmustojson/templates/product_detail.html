@@ -1,0 +1,8 @@
+<a href="{% url litmustocsv.views.home %}">home</a>
+<h1>{{ product_name }}</h1>
+<p>Select the branch and one or more Testgroups to migrate</p>
+<form action="" method="post">{% csrf_token %}
+{{ form.as_p }}
+<input type="submit" value="Submit" />
+</form>
+

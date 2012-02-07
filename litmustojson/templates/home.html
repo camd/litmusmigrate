@@ -1,0 +1,112 @@
+<head>
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/screen.css" media="screen, projection" />
+</head>
+
+<div class="simple">
+<h1>Litmus to JSON</h1>
+<p>Start by selecting which product to migrate</p>
+<form action="." method="POST">{% csrf_token %}
+
+    {{ form.non_field_errors }}
+    <div class="fieldWrapper">
+        {{ form.product.errors }}
+        <label for="id_product">Product:</label>
+        {{ form.product }}
+    </div>
+    <div class="fieldWrapper">
+        {{ form.branch.errors }}
+        <label for="id_branch">Branch:</label>
+            <select name="branch" id="id_branch">
+                {% for b in branches %}
+                  <option value="{{ b.branch_id }}" prod_id="{{ b.product_id }}">{{ b.name }}</option>
+                {% endfor %}
+            </select>
+    </div>
+    <div class="fieldWrapper">
+        {{ form.testgroups.errors }}
+        <label for="id_testgroups">Testgroups:</label>
+            <select class="tall" multiple="multiple" name="testgroups" id="id_testgroups">
+                {% for tg in testgroups %}
+                  <option value="{{ tg.testgroup_id }}" br_id="{{ tg.branch_id }}">{{ tg.name }}</option>
+                {% endfor %}
+            </select>
+    </div>
+
+<input id="id_getjson"type="submit" value="Get JSON" />
+</div>
+<script type="text/javascript" src="{{ STATIC_URL }}js/jquery-1.6.1.js"></script>
+<script>
+    $(document).ready(function() {
+
+        function on_product_set() {
+
+            var prod_id = $("#id_product").val();
+            var options = '<option value="None">--- Select One ---</option>';
+
+            $("#id_branch").show();
+            $("#id_testgroups").hide();
+            $("#id_getjson").hide();
+
+
+            if ($("#id_product").val() == "") {
+                $("#id_branch").hide();
+                $("#id_testgroups").hide();
+                $("#id_getjson").hide();
+
+            } else {
+                window.branch_options.each(function() {
+                    if ($(this).attr('prod_id') == prod_id) {
+                        options += '<option value="' + $(this).val() + '">' + $(this).text() + '</option>';
+                    }
+                });
+            }
+
+            $("#id_branch").html(options);   // populate select box with array
+
+            // now add the change function to the branches drop-down.
+            $("#id_branch").change(function() {
+                var br_id = $("#id_branch").val();
+                var b_opts = '';
+
+                $("#id_testgroups").show();
+                $("#id_getjson").show();
+
+                window.testgroup_options.each(function() {
+                    if ($(this).attr('br_id') == br_id) {
+                        b_opts += '<option value="' + $(this).val() + '">' + $(this).text() + '</option>';
+                    }
+
+                });
+
+                $("#id_testgroups").html(b_opts);   // populate select box with array
+
+            });
+
+        }
+
+        // hide secondary elements at first
+        $("#id_branch").hide();
+        $("#id_testgroups").hide();
+        $("#id_getjson").hide();
+
+
+        // store away the options for branches
+        window.branch_options = $("#id_branch").children();
+        $("#id_branch").children().remove().end().append('<option selected value="None">Select Product First</option>');
+
+        // store away the options for testgroups
+        window.testgroup_options = $("#id_testgroups").children();
+        $("#id_testgroups").children().remove().end().append('<option selected value="None">Select Branch First</option>');
+
+
+        $("#id_product").change(on_product_set);
+        on_product_set();
+
+
+    });
+
+
+
+</script>
+
+

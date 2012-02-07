@@ -81,10 +81,14 @@ def getsql(product_id, branch_id, testgroup_ids):
     tg_or_statement = ' or tg.testgroup_id = '.join(testgroup_ids)
 
     sql = '''
-select tc.testcase_id, tc.summary, tc.details, tc.regression_bug_id,
-  tc.community_enabled, tc.steps, tc.expected_results, u.email,
-  GROUP_CONCAT(REPLACE(sg.name, ",", "%%%%2C")) as tags,
-  GROUP_CONCAT(REPLACE(tg.name, ",", "%%%%2C")) as suites
+select tc.summary as "Test Case name",
+       u.email as "Authored By",
+       tc.creation_date as "Creation Date",
+       tc.details as "Description",
+       tc.regression_bug_id as "Bugs",
+  tc.steps as "Actions", tc.expected_results as "Expected Results",
+  GROUP_CONCAT(REPLACE(sg.name, ",", "%%%%2C")) as "Tags",
+  GROUP_CONCAT(REPLACE(tg.name, ",", "%%%%2C")) as "Suites"
 from testcases AS tc
 left join products as p on p.product_id = tc.product_id
 left join branches AS b on b.branch_id = tc.branch_id

@@ -1,0 +1,49 @@
+<h1>Litmus Data Extractor</h2>
+<p>This application will extract CSV for the Product, Branch and Testgroup you select.  
+    This result can then be imported into Case Conductor.</p>
+
+<form action="getcsv" method="POST">{% csrf_token %}
+
+Product:
+<select id = "product_choice">
+    <option value="-- select one --">-- select one --</option>
+    {% for p in product_list %}
+        {% ifequal p.name product %}
+            <option value="{{p.name}}" selected="selected">{{p.name}}</option>
+        {% else %}
+            <option value="{{p.name}}">{{p.name}}</option>
+        {% endifequal %}
+    {% endfor %}
+</select>
+<br>
+
+Branch:
+<select id = "branch_choice">
+    <option value="-- select one --">-- select one --</option>
+    {% for b in branch_list %}
+    <option value="{{branch.name}}">{{b.name}}</option>
+    {% endfor %}
+</select>
+<br>
+
+Testgroups:
+<br>
+<select multiple size=20 name = "testgroup">
+    {% for testgroup in testgroup_list %}
+    <option value="{{testgroup.name}}">{{testgroup.name}}</option>
+    {% endfor %}
+</select>
+<br>
+<input type="submit" value="Fetch CSV">
+</form>
+
+<script type="text/javascript">
+      window.onload = function()
+      {
+        document.getElementById('product_choice').onchange = function()
+        {
+          window.location.href = '/export?product='
+            + this.options[this.selectedIndex].value;
+        }
+      }
+</script>
