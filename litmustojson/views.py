@@ -24,7 +24,7 @@ def home(request):
             branch = form.cleaned_data['branch']
             testgroups = form.cleaned_data['testgroups']
             
-            response_data = get_response_json(branch, testgroups)
+            response_data = get_response_json(product, branch, testgroups)
 
             
 
@@ -49,8 +49,37 @@ def home(request):
                                },
                               context_instance=RequestContext(request))
 
+"""
+Return a JSON object in the following format:
+{
+    "Suites": [
+        {
+            "name": "suite name",
+            "description": "suite description"
+        }
+    ],
+    "Cases": [
+        {
+            "title": "case title",
+            "description": "case description",
+            "tags": ["tag1", "tag2", "tag3"],
+            "suites": ["suite1 name", "suite2 name", "suite3 name"],
+            "steps": [
+                {
+                    "action": "action text",
+                    "expected": "expected text"
+                },
+                {
+                    "action": "action text",
+                    "expected": "expected text"
+                }
+            ]
+        }
+    ]
+}
+"""
 
-def get_response_json(branch, testgroups):
+def get_response_json(product, branch, testgroups):
     suites = []
     for suite in testgroups:
         suites.append({
@@ -58,9 +87,50 @@ def get_response_json(branch, testgroups):
             "description": None
         })
 
+    # get the list of subgroups for the selected testgroups.
+    # Litmus' data model works that way.  No direct relation between
+    # testcases and testgroups.
+    subgroups = Subgroup.objects.filter(
+        testgroup__in=testgroups
+    ).distinct()
+
+    
     cases = []
+    
+    litmus_testcases = Testcase.objects.filter(
+        product = product,
+        branch = branch,
+        subgroup__in=subgroups).distinct()
+    
+    
+    for litmus_case in litmus_testcases:
+        tags = []
+        for tag in litmus_case.subgroup.all():
+            tags.append(tag.name)
+
+        cases.append({
+            "title": litmus_case.summary,
+            "description": litmus_case.details,
+            "tags": tags,
+            "suites": [x.name for x in testgroups],
+            "steps": [
+                {
+                    "action": litmus_case.steps,
+                    "expected": litmus_case.expected_results
+                }
+            ]
+        })
+    
+    
     response_data = {
         "Suites": suites,
         "Cases": cases
     }
     return response_data
+    
+    
+    
+    
+    
+    
+    
