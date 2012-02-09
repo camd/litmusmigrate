@@ -9,7 +9,7 @@ class PickerAdmin(admin.ModelAdmin):
 	fields = ['name']
 	inlines = [BranchInline]
 
-    
+
 admin.site.register(Product, PickerAdmin)
 admin.site.register(Branch)
 admin.site.register(Testcase)
