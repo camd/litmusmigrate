@@ -60,7 +60,7 @@ Return a JSON object in the following format:
     ],
     "cases": [
         {
-            "title": "case title",
+            "name": "case name",
             "description": "case description",
             "tags": ["tag1", "tag2", "tag3"],
             "suites": ["suite1 name", "suite2 name", "suite3 name"],
@@ -108,7 +108,7 @@ def get_response_json(product, branch, testgroups):
             tags.append(tag.name)
 
         cases.append({
-            "title": litmus_case.summary,
+            "name": litmus_case.summary,
             "description": litmus_case.details or "",
             "tags": tags,
             "suites": [x.name for x in testgroups],
