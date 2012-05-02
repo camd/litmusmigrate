@@ -1,18 +1,25 @@
+Litmus Migration Tools
+======================
 These tools are intended to help migrating out of Litmus and into MozTrap.
 
 Two tools exist here::
 
-1. **litmustocsv:** This is an earlier version to create a CSV file from Litmus data.  MozTrap does not import CSV, but this may be helpful for other purposes.
-2. **litmustojson:** This extracts data from Litmus for a specific product into a JSON format that MozTrap can import.
+1. **litmustocsv:** This is an earlier version to create a CSV file from Litmus
+data. MozTrap does not import CSV, but this may be helpful for other purposes.
+2. **litmustojson:** This extracts data from Litmus for a specific product into
+a JSON format that MozTrap can import.
 
-==litmustojson==
+litmustojson
+------------
 
-===Export from Litmus===
+Export from Litmus
+~~~~~~~~~~~~~~~~~~
 
 1. Select the Product, Branch and all the Testgroups you would like to migrate.
 2. Click "Get JSON" and the JSON file should be saved to your system.
 
-===Import to MozTrap===
+Import to MozTrap
+~~~~~~~~~~~~~~~~~
 
 1. Create the Product and Product Version in the MozTrap UI
 2. Open a terminal window on the machine where the MozTrap code is checked out (your repository clone)
