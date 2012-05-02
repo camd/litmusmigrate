@@ -84,7 +84,6 @@ def get_response_json(product, branch, testgroups):
     for suite in testgroups:
         suites.append({
             "name": suite.name,
-            "description": None
         })
 
     # get the list of subgroups for the selected testgroups.
@@ -110,7 +109,7 @@ def get_response_json(product, branch, testgroups):
 
         cases.append({
             "title": litmus_case.summary,
-            "description": litmus_case.details,
+            "description": litmus_case.details or "",
             "tags": tags,
             "suites": [x.name for x in testgroups],
             "steps": [
