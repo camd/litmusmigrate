@@ -4,11 +4,11 @@ These tools are intended to help migrating out of Litmus and into MozTrap.
 
 Two tools exist here::
 
-    1. **litmustocsv:** This is an earlier version to create a CSV file from Litmus
-       data. MozTrap does not import CSV, but this may be helpful for other purposes.
+1. **litmustocsv:** This is an earlier version to create a CSV file from Litmus
+   data. MozTrap does not import CSV, but this may be helpful for other purposes.
 
-    2. **litmustojson:** This extracts data from Litmus for a specific product into
-       a JSON format that MozTrap can import.
+2. **litmustojson:** This extracts data from Litmus for a specific product into
+   a JSON format that MozTrap can import.
 
 litmustojson
 ------------
